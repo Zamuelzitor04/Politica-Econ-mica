@@ -465,6 +465,8 @@ def _hoja_leeme(wb, ipc_base):
         ("• Ficha_fuentes: entidad, nombre exacto, cobertura, unidad, enlace, fecha de consulta y transformaciones.",
          NEGRO),
         ("• Figuras: las 4 figuras pedidas (título, ejes, unidad, período, fuente y nota).", NEGRO),
+        ("• Complementarias: extensiones opcionales (tasas reales, crédito vs. consumo, descomposición de la "
+         "morosidad, consumo por durabilidad), puntos de giro y figuras E1–E4.", NEGRO),
         ("• Mensual: insumos mensuales transcritos de las fuentes; la TPM mensual se calcula desde TPM_diaria.", NEGRO),
         ("• TPM_diaria: serie diaria de la TPM (BanRep) que alimenta el promedio mensual.", NEGRO),
         ("• Controles: verifica que los cálculos reproducen los indicadores publicados (SFC, DANE).", NEGRO),
@@ -506,5 +508,11 @@ def exportar(diaria, m, q, ipc_base):
     _hoja_ficha(wb)
     _hoja_figuras(wb, rutas)
     _hoja_controles(wb, q, f0, fila_mes)
+
+    from complementarias import calcular, figuras_extra, hoja_complementarias
+
+    comp = calcular(q)
+    hoja_complementarias(wb, comp, f0, figuras_extra(comp))
+    comp.to_csv(PROC / "complementarias_trimestral.csv", index_label="trimestre", float_format="%.6f")
     wb.save(OUT / "Taller2_base_trimestral.xlsx")
     print("Listo:", OUT / "Taller2_base_trimestral.xlsx")
