@@ -467,6 +467,10 @@ def _hoja_leeme(wb, ipc_base):
         ("• Figuras: las 4 figuras pedidas (título, ejes, unidad, período, fuente y nota).", NEGRO),
         ("• Complementarias: extensiones opcionales (tasas reales, crédito vs. consumo, descomposición de la "
          "morosidad, consumo por durabilidad), puntos de giro y figuras E1–E4.", NEGRO),
+        ("• Unidades: unidad y año de referencia de cada serie y cómo se hacen comparables (advertencias del monitor).",
+         NEGRO),
+        ("• Cotejo_monitor: nuestras series frente a la base enviada por el monitor (22-oct-2026); diferencia = 0.",
+         NEGRO),
         ("• Mensual: insumos mensuales transcritos de las fuentes; la TPM mensual se calcula desde TPM_diaria.", NEGRO),
         ("• TPM_diaria: serie diaria de la TPM (BanRep) que alimenta el promedio mensual.", NEGRO),
         ("• Controles: verifica que los cálculos reproducen los indicadores publicados (SFC, DANE).", NEGRO),
@@ -511,8 +515,22 @@ def exportar(diaria, m, q, ipc_base):
 
     from complementarias import calcular, figuras_extra, hoja_complementarias
 
+    from cotejo_monitor import hoja_cotejo, hoja_unidades, leer_monitor, resumen
+
+    mon = leer_monitor()
+    difs = resumen(mon, diaria, m, q)
+    print("Cotejo con la base del monitor (máx. |dif.|):")
+    for k, v in difs.items():
+        print(f"  {k:32s} {v:.2e}  {'OK' if v < 1e-6 else 'REVISAR'}")
+    hoja_cotejo(wb, mon, fila_mes, f0, q)
+    hoja_unidades(wb, f0, q)
+
     comp = calcular(q)
     hoja_complementarias(wb, comp, f0, figuras_extra(comp))
     comp.to_csv(PROC / "complementarias_trimestral.csv", index_label="trimestre", float_format="%.6f")
+    orden = ["Leeme", "Base_trimestral", "Unidades", "Ficha_fuentes", "Figuras", "Complementarias",
+             "Cotejo_monitor", "Controles", "Mensual", "TPM_diaria"]
+    wb._sheets = [wb[n] for n in orden]
+    wb.active = 0
     wb.save(OUT / "Taller2_base_trimestral.xlsx")
     print("Listo:", OUT / "Taller2_base_trimestral.xlsx")

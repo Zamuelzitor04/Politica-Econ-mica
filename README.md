@@ -22,4 +22,4 @@ python scripts/construir_base.py
 ```
 
 Produce `output/Taller2_base_trimestral.xlsx` (base con fórmulas, ficha de fuentes, figuras y controles),
-`output/figuras/*.png` y `data/processed/*.csv`. Explicación de cada cálculo: `docs/paso3_construccion.md`; figuras complementarias: `docs/figuras_complementarias.md`.
+`output/figuras/*.png` y `data/processed/*.csv`. Explicación de cada cálculo: `docs/paso3_construccion.md`; figuras complementarias: `docs/figuras_complementarias.md`; cotejo con la base del monitor: `docs/cotejo_monitor.md`.
